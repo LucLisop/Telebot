@@ -25,11 +25,13 @@ def a(client):
 	async def _(event):
 		print(event.stringify())
 		args = str(event.message.text).split(' ')
+		
 
 		if len(args) < 2:
 			comment = 'Delete chat!'
 		else:
-			comment = args[-1]
+			comment = ' '.join(args[1:])
+			print(comment)
 
 		for reason in reasons:
 			
