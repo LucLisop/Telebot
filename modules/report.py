@@ -1,6 +1,6 @@
 # Report
 '''
-.report:: Жалоба на чат\n\n<b>Использование</b>: \n<code>.report</code> <Комментарий к жалобе>(по желанию)
+.report:: Жалоба на чат\n\n<b>Использование</b>: \n<code>.report</code><кол-во раз> <Комментарий к жалобе>(по желанию)
 '''
 import asyncio
 from telethon import events
@@ -23,31 +23,36 @@ types.InputReportReasonOther()]
 def a(client):
 	@client.on(events.NewMessage(pattern=r"\.report", outgoing=True))
 	async def _(event):
-		print(event.stringify())
 		args = str(event.message.text).split(' ')
-		
-
 		if len(args) < 2:
+			times = 1
+		else: 
+			if args[1].isdigit():
+				times=int(args[1])
+
+
+		if len(args) < 3:
+
 			comment = 'Delete chat!'
 		else:
-			comment = ' '.join(args[1:])
-			print(comment)
-
-		for reason in reasons:
+			comment = ' '.join(args[2:])
+		for i in range(times):
+			for reason in reasons:
 			
-			result = await client(
-				functions.account.ReportPeerRequest(
-					peer=event.peer_id,
-					reason=reason,
-					message=comment
+				result = await client(
+					functions.account.ReportPeerRequest(
+						peer=event.peer_id,
+						reason=reason,
+						message=comment
+					)
 				)
-			)
-			try:
-				await event.edit(f'Жалоба {str(reason)} отправлена!')
-			except Exception as e:
-				print(e)
+				try:
+					reason_text = str(reason).replace('InputReportReason','').replace('()','')
+					await event.edit(f'Жалоба {reason_text} отправлена!')
+				except Exception as e:
+					print(e)
 
-		await event.edit(f'<b>Жалобы успешно отправлены!</b>',parse_mode='html')
+		await event.edit(f'<b>Жалобы ({int(times)}) успешно отправлены!</b>',parse_mode='html')
 
 
 		
